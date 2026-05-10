@@ -1,0 +1,28 @@
+name: Test abort-after-seconds and initial-wait-seconds
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      GITHUB_REF: refs/heads/main
+      GITHUB_EVENT_NAME: push
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          token: ${{ github.token }}
+          abort-after-seconds: "30"
+          initial-wait-seconds: "0"
+      - name: Assert step completed
+        env:
+          ACTUAL: ${{ steps.action.outputs.force_continued }}
+        run: |
+          echo "actual force_continued: $ACTUAL"
+          if [ "$ACTUAL" != "false" ] && [ "$ACTUAL" != "" ]; then
+            echo "FAIL: expected force_continued to be 'false' or empty when not continuing, got '$ACTUAL'"
+            exit 1
+          fi
+          echo "PASS: action completed without aborting"
