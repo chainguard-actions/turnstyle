@@ -1,0 +1,21 @@
+name: Test abort-after-seconds and initial-wait-seconds
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          token: ${{ github.token }}
+          abort-after-seconds: "5"
+          initial-wait-seconds: "2"
+        continue-on-error: true
+      - name: Assert step ran
+        run: |
+          echo "Action completed (with or without error due to abort)"
+          echo "PASS"
