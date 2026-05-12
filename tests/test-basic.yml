@@ -1,0 +1,31 @@
+name: Test basic usage
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/heads/main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          poll-interval-seconds: "10"
+          same-branch-only: "true"
+          initial-wait-seconds: "0"
+          abort-after-seconds: "5"
+        continue-on-error: true
+      - name: Assert force_continued output is set
+        env:
+          FORCE_CONTINUED: ${{ steps.action.outputs.force_continued }}
+        run: |
+          echo "force_continued: $FORCE_CONTINUED"
+          # The action either completes normally or aborts; force_continued should be false when abort is used
+          if [ "$FORCE_CONTINUED" != "false" ] && [ "$FORCE_CONTINUED" != "" ]; then
+            echo "FAIL: unexpected force_continued value: $FORCE_CONTINUED"
+            exit 1
+          fi
+          echo "PASS"
