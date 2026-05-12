@@ -9,6 +9,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
 | v3.2.1 | [`v3.2.1`](https://github.com/chainguard-actions/turnstyle/tree/v3.2.1) | — |
+| v3.2.2 | [`v3.2.2`](https://github.com/chainguard-actions/turnstyle/tree/v3.2.2) | — |
 
 ## Privacy
 
