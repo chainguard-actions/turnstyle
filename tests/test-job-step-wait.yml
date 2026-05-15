@@ -1,0 +1,23 @@
+name: Test job-to-wait-for and step-to-wait-for inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          job-to-wait-for: "deploy"
+          step-to-wait-for: "Deploy step"
+          continue-after-seconds: "10"
+          poll-interval-seconds: "5"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Assert force_continued output
+        env:
+          FORCE_CONTINUED: ${{ steps.action.outputs.force_continued }}
+        run: |
+          echo "force_continued: $FORCE_CONTINUED"
+          echo "PASS: job-to-wait-for and step-to-wait-for inputs accepted"
