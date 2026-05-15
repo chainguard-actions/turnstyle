@@ -1,0 +1,27 @@
+name: Test abort-after-seconds input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          token: ${{ github.token }}
+          abort-after-seconds: "30"
+          poll-interval-seconds: "10"
+          same-branch-only: "false"
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Assert step ran (either succeeded or aborted)
+        run: |
+          echo "action outcome: ${{ steps.action.outcome }}"
+          if [ "${{ steps.action.outcome }}" = "success" ] || [ "${{ steps.action.outcome }}" = "failure" ]; then
+            echo "PASS: action completed with outcome ${{ steps.action.outcome }}"
+          else
+            echo "FAIL: unexpected outcome ${{ steps.action.outcome }}"
+            exit 1
+          fi

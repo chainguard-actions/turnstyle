@@ -1,0 +1,29 @@
+name: Test basic usage with continue-after-seconds
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          token: ${{ github.token }}
+          poll-interval-seconds: "10"
+          same-branch-only: "true"
+          continue-after-seconds: "5"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Assert force_continued output is set
+        env:
+          FORCE_CONTINUED: ${{ steps.action.outputs.force_continued }}
+        run: |
+          echo "force_continued: $FORCE_CONTINUED"
+          if [ "$FORCE_CONTINUED" != "true" ] && [ "$FORCE_CONTINUED" != "false" ]; then
+            echo "FAIL: expected force_continued to be 'true' or 'false', got '$FORCE_CONTINUED'"
+            exit 1
+          fi
+          echo "PASS"

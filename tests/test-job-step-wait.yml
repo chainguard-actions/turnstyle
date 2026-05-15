@@ -1,0 +1,29 @@
+name: Test job-to-wait-for and step-to-wait-for inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          token: ${{ github.token }}
+          job-to-wait-for: "deploy"
+          step-to-wait-for: "Deploy step"
+          continue-after-seconds: "5"
+          poll-interval-seconds: "5"
+          same-branch-only: "false"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Assert force_continued output is set
+        env:
+          FORCE_CONTINUED: ${{ steps.action.outputs.force_continued }}
+        run: |
+          echo "force_continued: $FORCE_CONTINUED"
+          if [ "$FORCE_CONTINUED" != "true" ] && [ "$FORCE_CONTINUED" != "false" ]; then
+            echo "FAIL: expected force_continued to be 'true' or 'false', got '$FORCE_CONTINUED'"
+            exit 1
+          fi
+          echo "PASS"
